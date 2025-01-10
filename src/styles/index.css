@@ -4,6 +4,7 @@ body {
     align-items: center;
     height: 100vh;
     margin: 0;
+    background-color: rgb(107, 41, 41);
 }
 
 .counter {
@@ -11,8 +12,8 @@ body {
     background-color: black;
     justify-content: space-between;
     color: white;
-    width: 280px;
-    font-size: 25px;
+    width: 380px;
+    font-size: 50px;
     border-radius: 10px;
 }
 
