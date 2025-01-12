@@ -8,13 +8,17 @@ const Home = () => {
 	const [counter, setCounter] = useState(0);
 	const [isRunning, setIsRunning] = useState(false);
 	const [alarmTime, setAlarmTime] = useState(null)
+	const [countDown, setCountDown] = useState(null)
 
 	useEffect(() => {
 		let interval = null;
-
 		if (isRunning) {
 			interval = setInterval(() => {
 				setCounter((prevCounter) => prevCounter + 1);
+
+				if (countDown !== null && countDown > 0) {
+					setCountDown((prevCounter) => prevCounter - 1)
+				}
 			}, 1000);
 		} else if (!isRunning && interval) {
 			clearInterval(interval);
@@ -26,28 +30,41 @@ const Home = () => {
 		}
 
 		return () => clearInterval(interval)
-	}, [isRunning, counter, alarmTime]);
+	}, [isRunning, counter, alarmTime, countDown]);
 
-	const fiveDigit = Math.floor(counter / 10000) % 10;
-    const fourDigit = Math.floor(counter / 1000) % 10;
-    const threeDigit = Math.floor(counter / 100) % 10;
-    const twoDigit = Math.floor(counter / 10) % 10;
-    const oneDigit = counter % 10;
+	const activeCounter = countDown !== null && countDown >= 0 ? countDown : counter;
+
+    const fiveDigit = Math.floor(activeCounter / 10000) % 10;
+    const fourDigit = Math.floor(activeCounter / 1000) % 10;
+    const threeDigit = Math.floor(activeCounter / 100) % 10;
+    const twoDigit = Math.floor(activeCounter / 10) % 10;
+    const oneDigit = activeCounter % 10;
 
 	const handlePlay = () => setIsRunning(true);
 	const handlePause = () => setIsRunning(false);
 	const handleStop = () => {
 		setIsRunning(false)
 		setCounter(0)
+		setCountDown(null)
 	}
 
 	const handleSetAlarm = (timeInSeconds) => {
 		if (timeInSeconds <= 0 || isNaN(timeInSeconds)) {
-			alert("Plase, introduce a valid time.");
+			alert("Please enter a valid time in seconds");
 			return;
 		}
 		setAlarmTime (counter + timeInSeconds);
-		alert(`alarm set for ${timeInSeconds} seconds`)
+		alert(`Alarm set for ${timeInSeconds} seconds`)
+	}
+
+	const handleSetCountDown = (timeInSeconds) => {
+		if (timeInSeconds <= 0 || isNaN(timeInSeconds)) {
+			alert("Please enter a valid time in seconds");
+			return;
+		}
+		setCountDown(timeInSeconds);
+		alert(`Countdown started for ${timeInSeconds} seconds`);
+		setIsRunning(true);
 	}
 
 
@@ -68,7 +85,9 @@ const Home = () => {
 		<Alarm 
 			onSetAlarm={handleSetAlarm}
 		 />
-		<CountDown />
+		<CountDown
+			onSetCountDown={handleSetCountDown}
+		 />
 	</div>);
 };
 
