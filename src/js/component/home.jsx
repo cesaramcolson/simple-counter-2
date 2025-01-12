@@ -7,6 +7,7 @@ import CountDown from "./CountDown";
 const Home = () => {
 	const [counter, setCounter] = useState(0);
 	const [isRunning, setIsRunning] = useState(false);
+	const [alarmTime, setAlarmTime] = useState(null)
 
 	useEffect(() => {
 		let interval = null;
@@ -18,8 +19,14 @@ const Home = () => {
 		} else if (!isRunning && interval) {
 			clearInterval(interval);
 		}
+
+		if (alarmTime !== null && counter >= alarmTime) {
+			alert("Alarm Time!!")
+			setAlarmTime(null);
+		}
+
 		return () => clearInterval(interval)
-	}, [isRunning]);
+	}, [isRunning, counter, alarmTime]);
 
 	const fiveDigit = Math.floor(counter / 10000) % 10;
     const fourDigit = Math.floor(counter / 1000) % 10;
@@ -34,6 +41,17 @@ const Home = () => {
 		setCounter(0)
 	}
 
+	const handleSetAlarm = (timeInSeconds) => {
+		if (timeInSeconds <= 0 || isNaN(timeInSeconds)) {
+			alert("Plase, introduce a valid time.");
+			return;
+		}
+		setAlarmTime (counter + timeInSeconds);
+		alert(`alarm set for ${timeInSeconds} seconds`)
+	}
+
+
+
 	return (<div className="container">
 		<SimpleCounter
 		    fiveDigit={fiveDigit.toString()}
@@ -47,7 +65,9 @@ const Home = () => {
 			onPause={handlePause}
 			onStop={handleStop}
 		/>
-		<Alarm />
+		<Alarm 
+			onSetAlarm={handleSetAlarm}
+		 />
 		<CountDown />
 	</div>);
 };

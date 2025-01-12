@@ -1,25 +1,17 @@
 import React, { useState } from "react";
+import PropTypes from "prop-types";
 
-const Alarm = () => {
-    const [alarmTime, setAlarmTime] = useState("");
+
+const Alarm = ( {onSetAlarm}) => {
+    const [inputTime, setInputTime] = useState("");
 
     const handleInputChange = (event) => {
-        setAlarmTime(event.target.value);
+        setInputTime(event.target.value);
     }
 
-    const handleSetAlarm = () => {
-        const timeInSeconds = parseInt(alarmTime.trim(), 10);
-
-        if (isNaN(timeInSeconds) || timeInSeconds <= 0) {
-            alert("Por favor, introduce un tiempo válido en segundos.");
-            return;
-        }
-
-        alert(`Alarma configurada para ${timeInSeconds} segundos.`);
-
-        setTimeout(() => {
-            alert("¡Es hora de la alarma!");
-        }, timeInSeconds * 1000);
+    const handleSetAlarmClick = () => {
+        const timeInSeconds = parseInt(inputTime.trim(), 10);
+        onSetAlarm(timeInSeconds)
     };
 
     return (
@@ -27,7 +19,7 @@ const Alarm = () => {
             <button 
                 className="btn btn-warning col-sm-3" 
                 style={{ fontSize: "16px" }}
-                onClick={handleSetAlarm}
+                onClick={handleSetAlarmClick}
             >
                 Set Alarm
             </button>
@@ -36,13 +28,17 @@ const Alarm = () => {
                     type="text" 
                     className="form-control" 
                     id="alarm" 
-                    value={alarmTime}
+                    value={inputTime}
                     onChange={handleInputChange} 
                     placeholder="Tiempo en segundos"
                 />
             </div>
         </div>
     )
-}
+};
+
+Alarm.PropTypes = {
+    onSetAlarm: PropTypes.func.isRequired,
+};
 
 export default Alarm
