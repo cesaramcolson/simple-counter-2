@@ -9,20 +9,31 @@ const Home = () => {
 	const [isRunning, setIsRunning] = useState(false);
 	const [alarmTime, setAlarmTime] = useState(null)
 	const [countDown, setCountDown] = useState(null)
+	const [isCountingDown, setIsCountingDown] = useState(false)
 
 	useEffect(() => {
 		let interval = null;
+
 		if (isRunning) {
 			interval = setInterval(() => {
-				setCounter((prevCounter) => prevCounter + 1);
-
-				if (countDown !== null && countDown > 0) {
-					setCountDown((prevCounter) => prevCounter - 1)
+				if (isCountingDown) {
+					setCountDown((prevCountDown) => {
+						if (prevCountDown > 0) return prevCountDown - 1;
+						setIsCountingDown(false)
+						setCounter(0)
+						setIsRunning(false);
+						return null;
+					});
+				} else {
+					setCounter((prevCounter) => prevCounter + 1)
+					if (countDown !== null && counter + 1 === countDown) {
+						setIsCountingDown(true);
+					}
 				}
 			}, 1000);
 		} else if (!isRunning && interval) {
-			clearInterval(interval);
-		}
+            clearInterval(interval);
+        }
 
 		if (alarmTime !== null && counter >= alarmTime) {
 			alert("Alarm Time!!")
@@ -30,15 +41,13 @@ const Home = () => {
 		}
 
 		return () => clearInterval(interval)
-	}, [isRunning, counter, alarmTime, countDown]);
+	}, [isRunning, counter, alarmTime, countDown, isCountingDown]);
 
-	const activeCounter = countDown !== null && countDown >= 0 ? countDown : counter;
-
-    const fiveDigit = Math.floor(activeCounter / 10000) % 10;
-    const fourDigit = Math.floor(activeCounter / 1000) % 10;
-    const threeDigit = Math.floor(activeCounter / 100) % 10;
-    const twoDigit = Math.floor(activeCounter / 10) % 10;
-    const oneDigit = activeCounter % 10;
+    const fiveDigit = Math.floor((isCountingDown ? countDown : counter) / 10000) % 10;
+    const fourDigit = Math.floor((isCountingDown ? countDown : counter) / 1000) % 10;
+    const threeDigit = Math.floor((isCountingDown ? countDown : counter) / 100) % 10;
+    const twoDigit = Math.floor((isCountingDown ? countDown : counter) / 10) % 10;
+    const oneDigit = (isCountingDown ? countDown : counter) % 10;
 
 	const handlePlay = () => setIsRunning(true);
 	const handlePause = () => setIsRunning(false);
@@ -46,6 +55,7 @@ const Home = () => {
 		setIsRunning(false)
 		setCounter(0)
 		setCountDown(null)
+		setIsCountingDown(false);
 	}
 
 	const handleSetAlarm = (timeInSeconds) => {
@@ -62,8 +72,8 @@ const Home = () => {
 			alert("Please enter a valid time in seconds");
 			return;
 		}
-		setCountDown(timeInSeconds);
-		alert(`Countdown started for ${timeInSeconds} seconds`);
+		setCountDown(counter + timeInSeconds);
+		alert(`Count down set for ${counter + timeInSeconds} seconds`);
 		setIsRunning(true);
 	}
 
